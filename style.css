@@ -1,0 +1,256 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: radial-gradient(circle, #fff0f5 0%, #fce4ec 60%, #f8bbd0 100%);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  overflow-x: hidden;
+  position: relative;
+}
+
+.btn-musica {
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  background: #ec407a;
+  color: white;
+  border: 2px solid #c2185b;
+  padding: 10px 18px;
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  transition: transform 0.2s, background 0.3s;
+  z-index: 100;
+}
+
+.btn-musica:hover {
+  transform: scale(1.05);
+  background: #d81b60;
+}
+
+.header {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.header h1 {
+  font-family: 'Sacramento', cursive;
+  font-size: 3.2rem;
+  color: #880e4f;
+}
+
+.header p {
+  font-size: 1rem;
+  color: #ad1457;
+  margin-top: 5px;
+}
+
+/* Layout del juego */
+.juego-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 25px;
+  justify-content: center;
+  align-items: flex-start;
+  max-width: 900px;
+  width: 100%;
+  margin: 20px 0;
+}
+
+/* Lista de Palabras */
+.contenedor-palabras {
+  background: white;
+  padding: 20px;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  min-width: 220px;
+  flex: 1;
+}
+
+.contenedor-palabras h2 {
+  font-size: 1.2rem;
+  color: #880e4f;
+  margin-bottom: 12px;
+  text-align: center;
+  border-bottom: 2px dashed #f8bbd0;
+  padding-bottom: 8px;
+}
+
+.contenedor-palabras ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.contenedor-palabras li {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #ad1457;
+  padding: 6px 12px;
+  border-radius: 12px;
+  background: #fff0f5;
+  transition: all 0.3s ease;
+}
+
+/* Estilo cuando la palabra ha sido encontrada */
+.contenedor-palabras li.encontrada {
+  text-decoration: line-through;
+  background: #c8e6c9;
+  color: #2e7d32;
+  opacity: 0.7;
+}
+
+/* Tablero de Sopa de Letras */
+.contenedor-tablero {
+  background: white;
+  padding: 15px;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+.tablero {
+  display: grid;
+  grid-template-columns: repeat(14, 1fr);
+  gap: 4px;
+  user-select: none;
+  touch-action: none;
+}
+
+.celda {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #4a148c;
+  background: #f3e5f5;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.celda:hover {
+  background: #e1bee7;
+}
+
+/* Celda seleccionada mientras arrastras/haces clic */
+.celda.seleccionada {
+  background: #ff4081 !important;
+  color: white !important;
+  transform: scale(1.08);
+}
+
+/* Celdas de palabras encontradas */
+.celda.encontrada {
+  background: #81c784 !important;
+  color: white !important;
+}
+
+/* Botón Reiniciar */
+.btn-reiniciar {
+  background: #ec407a;
+  color: white;
+  border: none;
+  padding: 12px 26px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 30px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(236, 64, 122, 0.4);
+  transition: transform 0.2s;
+}
+
+.btn-reiniciar:hover {
+  transform: scale(1.05);
+}
+
+/* Modal */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.65);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal.oculto {
+  display: none;
+}
+
+.modal-contenido {
+  background: white;
+  padding: 30px;
+  border-radius: 20px;
+  max-width: 380px;
+  width: 85%;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+  animation: popIn 0.3s ease;
+}
+
+@keyframes popIn {
+  from { transform: scale(0.7); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.cerrar {
+  position: absolute;
+  top: 8px;
+  right: 15px;
+  font-size: 28px;
+  font-weight: bold;
+  color: #888;
+  cursor: pointer;
+}
+
+.modal-contenido h2 {
+  color: #ad1457;
+  margin-bottom: 10px;
+}
+
+.modal-contenido p {
+  color: #5d4037;
+  font-size: 1.05rem;
+}
+
+/* Corazones animados al ganar */
+.corazon-flotante {
+  position: fixed;
+  font-size: 1.8rem;
+  pointer-events: none;
+  z-index: 2000;
+  animation: caerCorazon 3s linear forwards;
+}
+
+@keyframes caerCorazon {
+  0% { transform: translateY(-50px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+}
+
+/* Responsivo para móviles */
+@media (max-width: 500px) {
+  .celda {
+    width: 24px;
+    height: 24px;
+    font-size: 0.8rem;
+  }
+}
