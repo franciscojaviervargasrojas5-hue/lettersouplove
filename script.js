@@ -1,4 +1,4 @@
-// Palabras personalizadas
+// Lista de palabras actualizada (sin "AL INFINITO Y MAS ALLA")
 const palabras = [
   "FRANIA",
   "KENIA",
@@ -13,10 +13,10 @@ const palabras = [
   "AMOR DE LA VIDA"
 ];
 
-const TAMANO = 14; // Matriz 14x14
+const TAMANO = 14;
 let matriz = [];
 let seleccion = [];
-let seleccionando = false;
+let celdaInicio = null;
 let palabrasEncontradas = [];
 
 const tableroEl = document.getElementById('tablero');
@@ -41,7 +41,6 @@ btnMusica.addEventListener('click', () => {
   musicaSonando = !musicaSonando;
 });
 
-// Crear lista de palabras en HTML
 function renderizarListaPalabras() {
   listaPalabrasEl.innerHTML = '';
   palabras.forEach(palabra => {
@@ -55,26 +54,23 @@ function renderizarListaPalabras() {
   });
 }
 
-// Inicializar matriz vacía
 function crearMatrizVacia() {
   matriz = Array(TAMANO).fill(null).map(() => Array(TAMANO).fill(''));
 }
 
-// Direcciones posibles: Horizontal, Vertical y Diagonal
 const direcciones = [
-  { r: 0, c: 1 },   // Horizontal derecha
-  { r: 1, c: 0 },   // Vertical abajo
+  { r: 0, c: 1 },   // Horizontal
+  { r: 1, c: 0 },   // Vertical
   { r: 1, c: 1 },   // Diagonal abajo-derecha
   { r: -1, c: 1 }   // Diagonal arriba-derecha
 ];
 
-// Colocar palabra limpia (sin espacios) en el tablero
 function colocarPalabra(palabraOriginal) {
   const palabra = palabraOriginal.replace(/\s+/g, '');
   let colocada = false;
   let intentos = 0;
 
-  while (!colocada && intentos < 200) {
+  while (!colocada && intentos < 300) {
     intentos++;
     const dir = direcciones[Math.floor(Math.random() * direcciones.length)];
     const filaInicio = Math.floor(Math.random() * TAMANO);
@@ -106,7 +102,6 @@ function colocarPalabra(palabraOriginal) {
   }
 }
 
-// Llenar espacios vacíos con letras aleatorias
 function llenarEspaciosVacios() {
   const letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   for (let r = 0; r < TAMANO; r++) {
@@ -118,7 +113,6 @@ function llenarEspaciosVacios() {
   }
 }
 
-// Dibujar tablero en HTML
 function renderizarTablero() {
   tableroEl.innerHTML = '';
   for (let r = 0; r < TAMANO; r++) {
@@ -129,23 +123,19 @@ function renderizarTablero() {
       celda.dataset.col = c;
       celda.textContent = matriz[r][c];
 
-      // Eventos Touch y Mouse
-      celda.addEventListener('mousedown', iniciarSeleccion);
-      celda.addEventListener('mouseenter', moverSeleccion);
-      celda.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        iniciarSeleccion(e);
-      });
-      
+      // Eventos Táctiles y de Ratón
+      celda.addEventListener('pointerdown', manejarInicioTocando);
+      celda.addEventListener('pointerenter', manejarMoverTocando);
+
       tableroEl.appendChild(celda);
     }
   }
 
-  document.addEventListener('mouseup', finalizarSeleccion);
-  document.addEventListener('touchend', finalizarSeleccion);
+  document.addEventListener('pointerup', manejarFinTocando);
 }
 
-function iniciarSeleccion(e) {
+function manejarInicioTocando(e) {
+  e.preventDefault();
   if (!musicaSonando) {
     musicaFondo.play().then(() => {
       musicaSonando = true;
@@ -153,36 +143,71 @@ function iniciarSeleccion(e) {
     }).catch(() => {});
   }
 
-  seleccionando = true;
-  limpiarSeleccionActual();
-  const target = e.target.closest('.celda') || document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY);
-  if (target && target.classList.contains('celda')) {
-    agregarACeldaSeleccionada(target);
+  const celda = e.target.closest('.celda');
+  if (!celda) return;
+
+  // Selección fácil para móviles (Tocar inicio y fin)
+  if (!celdaInicio) {
+    limpiarSeleccion();
+    celdaInicio = celda;
+    marcarLinea(celdaInicio, celdaInicio);
+  } else {
+    marcarLinea(celdaInicio, celda);
+    verificarPalabra();
+    celdaInicio = null;
   }
 }
 
-function moverSeleccion(e) {
-  if (!seleccionando) return;
-  const target = e.target.closest('.celda');
-  if (target && !seleccion.includes(target)) {
-    agregarACeldaSeleccionada(target);
+function manejarMoverTocando(e) {
+  if (e.buttons === 1 && celdaInicio) {
+    const celda = document.elementFromPoint(e.clientX, e.clientY)?.closest('.celda');
+    if (celda) {
+      marcarLinea(celdaInicio, celda);
+    }
   }
 }
 
-function agregarACeldaSeleccionada(celdaEl) {
-  seleccion.push(celdaEl);
-  celdaEl.classList.add('seleccionada');
+function manejarFinTocando() {
+  if (seleccion.length > 1 && celdaInicio) {
+    verificarPalabra();
+    celdaInicio = null;
+  }
 }
 
-function limpiarSeleccionActual() {
-  seleccion.forEach(el => el.classList.remove('seleccionada'));
+function marcarLinea(inicio, fin) {
+  limpiarSeleccion();
+
+  const r1 = parseInt(inicio.dataset.fila);
+  const c1 = parseInt(inicio.dataset.col);
+  const r2 = parseInt(fin.dataset.fila);
+  const c2 = parseInt(fin.dataset.col);
+
+  const dr = Math.sign(r2 - r1);
+  const dc = Math.sign(c2 - c1);
+
+  if (r1 === r2 || c1 === c2 || Math.abs(r2 - r1) === Math.abs(c2 - c1)) {
+    let currR = r1;
+    let currC = c1;
+
+    while (true) {
+      const celdaEl = document.querySelector(`.celda[data-fila="${currR}"][data-col="${currC}"]`);
+      if (celdaEl) {
+        celdaEl.classList.add('seleccionada');
+        seleccion.push(celdaEl);
+      }
+      if (currR === r2 && currC === c2) break;
+      currR += dr;
+      currC += dc;
+    }
+  }
+}
+
+function limpiarSeleccion() {
+  document.querySelectorAll('.celda.seleccionada').forEach(el => el.classList.remove('seleccionada'));
   seleccion = [];
 }
 
-function finalizarSeleccion() {
-  if (!seleccionando) return;
-  seleccionando = false;
-
+function verificarPalabra() {
   const textoSeleccionado = seleccion.map(el => el.textContent).join('');
   const textoInvertido = textoSeleccionado.split('').reverse().join('');
 
@@ -208,10 +233,9 @@ function finalizarSeleccion() {
     }
   }
 
-  limpiarSeleccionActual();
+  limpiarSeleccion();
 }
 
-// Lluvia de corazones al ganar
 function lanzarLluviaCorazones() {
   for (let i = 0; i < 40; i++) {
     setTimeout(() => {
@@ -226,9 +250,9 @@ function lanzarLluviaCorazones() {
   }
 }
 
-// Iniciar Juego
 function iniciarJuego() {
   palabrasEncontradas = [];
+  celdaInicio = null;
   crearMatrizVacia();
   palabras.forEach(p => colocarPalabra(p));
   llenarEspaciosVacios();
@@ -236,9 +260,7 @@ function iniciarJuego() {
   renderizarTablero();
 }
 
-// Eventos de Modal
 cerrarModal.addEventListener('click', () => modalVictoria.classList.add('oculto'));
 btnReiniciar.addEventListener('click', iniciarJuego);
 
-// Cargar la primera vez
 iniciarJuego();
