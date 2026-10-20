@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nuestra Sopa de Letras de Amor 💕</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Sacramento&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- Música de fondo opcional -->
+  <audio id="musicaFondo" loop src="cancion.mp3"></audio>
+  <button id="btnMusica" class="btn-musica">🎵 Reproducir Música</button>
+
+  <header class="header">
+    <h1>💕 Sopa de Letras de Amor 💕</h1>
+    <p>Encuentra todas nuestras palabras especiales escondidas en el tablero.</p>
+  </header>
+
+  <main class="juego-container">
+    <!-- Lista de Palabras -->
+    <aside class="contenedor-palabras">
+      <h2>Nuestras Palabras ❤️</h2>
+      <ul id="listaPalabras"></ul>
+    </aside>
+
+    <!-- Tablero de la Sopa de Letras -->
+    <section class="contenedor-tablero">
+      <div id="tablero" class="tablero"></div>
+    </section>
+  </main>
+
+  <div class="controles">
+    <button id="btnReiniciar" class="btn-reiniciar">🔄 Reiniciar Tablero</button>
+  </div>
+
+  <!-- Modal de Victoria Final -->
+  <div id="modalVictoria" class="modal oculto">
+    <div class="modal-contenido">
+      <span id="cerrarModal" class="cerrar">&times;</span>
+      <h2>¡Lo lograste, mi amor! 💖</h2>
+      <p>Encontraste todas las palabras cucha hermosa. Eres lo más bonito de mi vida, te amo muchisiismo!!.</p>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
